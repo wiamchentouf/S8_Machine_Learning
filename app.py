@@ -25,7 +25,7 @@ y = df['cible']
 
 # --- Menu latéral de navigation ---
 st.sidebar.title("Navigation")
-menu = ["Accueil", "LDA & QDA", "PCA", "SVM", "KNN", "Arbre de Décision"]
+menu = ["Accueil", "LDA & QDA", "PCA", "SVM", "KNN", "Arbre de Décision","Mes Présentations"]
 choix = st.sidebar.selectbox("Sélectionnez l'algorithme", menu)
 
 # --- Logique de l'application ---
