@@ -85,7 +85,7 @@ elif choix == "Arbre de Décision":
 elif choix == "Mes Présentations":
     st.title("Mes Supports de Cours")
     # هذا السطر يجلب جميع الملفات في المستودع تلقائياً
-    fichiers = [f for f in os.listdir('.') if f.endswith(('.pdf', '.pptx', '.ipynb'))]
+    fichiers = [f for f in os.listdir('.') if f.endswith(('.pdf', '.pptx', '.pptx'))]
     for f in fichiers:
         url = f"https://github.com/wiamchentouf/S8_Machine_Learning/raw/main/{f.replace(' ', '%20')}"
         st.markdown(f"- [📥 Télécharger {f}]({url})")
