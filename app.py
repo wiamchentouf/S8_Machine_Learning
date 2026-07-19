@@ -1,78 +1,84 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, accuracy_score
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier, plot_tree
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.decomposition import PCA
 
-# --- Configuration ---
-st.set_page_config(page_title="Projet ML - S8", layout="wide")
+# --- Configuration de la page ---
+st.set_page_config(page_title="Interface ML", layout="wide")
 
+# --- Chargement des données ---
 @st.cache_data
-def get_data():
-    X, y = make_classification(n_samples=300, n_features=5, n_classes=2, random_state=42)
-    return X, y
+def load_data():
+    # تأكدي أن ملف data.csv موجود في GitHub بنفس هذا الاسم
+    return pd.read_csv("data.csv")
 
-X, y = get_data()
+df = load_data()
+target_col = df.columns[-1]  # نفترض أن العمود الأخير هو الهدف
+X = df.drop(target_col, axis=1)
+y = df[target_col]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# --- Fonction pour afficher les résultats et le graphique ---
-def afficher_model(model, X_test, y_test, nom_model):
+# --- Fonction d'affichage ---
+def afficher_resultats(model, nom):
     y_pred = model.predict(X_test)
-    st.write(f"### Résultats pour {nom_model}")
-    st.write(f"**Précision :** {accuracy_score(y_test, y_pred):.2%}")
+    st.write(f"### Résultats pour : {nom}")
+    st.write(f"**Précision du modèle :** {accuracy_score(y_test, y_pred):.2%}")
     
     # Matrice de confusion
     cm = confusion_matrix(y_test, y_pred)
-    fig, ax = plt.subplots(figsize=(4, 3))
-    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", ax=ax)
+    fig, ax = plt.subplots(figsize=(5, 3))
+    sns.heatmap(cm, annot=True, fmt="d", cmap="Greens")
     plt.title("Matrice de Confusion")
     st.pyplot(fig)
 
-# --- Menu ---
+# --- Sidebar ---
 st.sidebar.title("Navigation")
-menu = ["Accueil", "KNN", "LDA", "PCA", "SVM", "Decision Tree"]
-choice = st.sidebar.selectbox("Sélectionnez l'algorithme", menu)
+choix = st.sidebar.selectbox("Sélectionnez l'algorithme", ["Accueil", "KNN", "SVM", "Decision Tree", "LDA", "PCA"])
 
 # --- Logique ---
-if choice == "Accueil":
-    st.title("Interface de Démonstration : Machine Learning")
-    st.write("Bienvenue. Choisissez un algorithme dans le menu à gauche pour voir les résultats et les graphiques.")
+if choix == "Accueil":
+    st.title("Interface de Démonstration Machine Learning")
+    st.write("Bienvenue. Sélectionnez un algorithme dans le menu pour voir les analyses et les graphiques.")
+    st.write("Données chargées :", df.head())
 
-elif choice == "KNN":
-    model = KNeighborsClassifier().fit(X_train, y_train)
-    afficher_model(model, X_test, y_test, "KNN")
+elif choix == "KNN":
+    k = st.sidebar.slider("Nombre de voisins (K)", 1, 15, 3)
+    model = KNeighborsClassifier(n_neighbors=k).fit(X_train, y_train)
+    afficher_resultats(model, "KNN")
 
-elif choice == "LDA":
-    model = LinearDiscriminantAnalysis().fit(X_train, y_train)
-    afficher_model(model, X_test, y_test, "LDA")
-
-elif choice == "PCA":
-    st.title("Analyse en Composantes Principales (PCA)")
-    pca = PCA(n_components=2)
-    X_pca = pca.fit_transform(X)
-    fig, ax = plt.subplots()
-    ax.scatter(X_pca[:, 0], X_pca[:, 1], c=y, cmap='viridis', edgecolors='k')
-    plt.title("Projection PCA (2D)")
-    st.pyplot(fig)
-
-elif choice == "SVM":
+elif choix == "SVM":
     model = SVC().fit(X_train, y_train)
-    afficher_model(model, X_test, y_test, "SVM")
+    afficher_resultats(model, "SVM")
 
-elif choice == "Decision Tree":
-    st.title("Arbre de Décision")
-    model = DecisionTreeClassifier(max_depth=3).fit(X_train, y_train)
-    afficher_model(model, X_test, y_test, "Arbre de Décision")
+elif choix == "Decision Tree":
+    profondeur = st.sidebar.slider("Profondeur de l'arbre", 1, 10, 3)
+    model = DecisionTreeClassifier(max_depth=profondeur).fit(X_train, y_train)
+    afficher_resultats(model, "Arbre de Décision")
     
-    st.write("### Visualisation de l'Arbre")
-    fig, ax = plt.subplots(figsize=(12, 6))
+    st.write("### Visualisation de l'arbre")
+    fig, ax = plt.subplots(figsize=(10, 5))
     plot_tree(model, filled=True, ax=ax)
     st.pyplot(fig)
+
+elif choix == "LDA":
+    model = LinearDiscriminantAnalysis().fit(X_train, y_train)
+    afficher_resultats(model, "LDA")
+
+elif choix == "PCA":
+    st.title("Analyse en Composantes Principales (PCA)")
+    n = st.sidebar.slider("Nombre de composantes", 1, min(X.shape[1], 5), 2)
+    pca = PCA(n_components=n)
+    X_pca = pca.fit_transform(X)
+    
+    fig, ax = plt.subplots()
+    ax.scatter(X_pca[:, 0], X_pca[:, 1], c=y, cmap='viridis')
+    plt.title("Projection PCA 2D")
+    st.pyplot(fig)
+    st.write("Variance expliquée :", pca.explained_variance_ratio_)
