@@ -71,11 +71,10 @@ elif choix == "Arbre de Décision":
 # --- Pied de page ---
 st.sidebar.markdown("---")
 st.sidebar.info("Application créée pour illustrer les concepts de Machine Learning.")
+
 elif choix == "Mes Présentations":
     st.title("Mes Supports de Cours")
     st.write("Cliquez sur les liens pour télécharger mes présentations :")
-    
-    # روابط مباشرة للملفات الموجودة في المستودع
     st.markdown("[Analyse Discriminante.pptx](https://github.com/wiamchentouf/S8_Machine_Learning/raw/main/Analyse%20Discriminante.pptx)")
     st.markdown("[Guide ML Détail.pdf](https://github.com/wiamchentouf/S8_Machine_Learning/raw/main/Guide_ML_Detaille.pdf)")
     st.markdown("[SVM Théorie.pptx](https://github.com/wiamchentouf/S8_Machine_Learning/raw/main/SVM_Théorie_et_Pratique.pptx)")
