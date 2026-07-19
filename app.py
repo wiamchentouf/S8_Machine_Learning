@@ -73,6 +73,7 @@ st.sidebar.markdown("---")
 st.sidebar.info("Application créée pour illustrer les concepts de Machine Learning.")
 
 elif choix == "Mes Présentations":
+
     st.title("Mes Supports de Cours")
     st.write("Cliquez sur les liens pour télécharger mes présentations :")
     st.markdown("[Analyse Discriminante.pptx](https://github.com/wiamchentouf/S8_Machine_Learning/raw/main/Analyse%20Discriminante.pptx)")
